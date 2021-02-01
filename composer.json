@@ -1,0 +1,22 @@
+{
+  "name": "starbug/queue",
+  "description": "Background task queue.",
+  "keywords": ["beanstalkd", "redis"],
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Ali Gangji",
+      "homepage": "https://github.com/cogentParadigm"
+    }
+  ],
+  "require-dev": {
+    "starbug/devel": "^1.0",
+    "predis/predis": "^1.1",
+    "pda/pheanstalk": "^4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Starbug\\Queue\\": "src/"
+    }
+  }
+}
