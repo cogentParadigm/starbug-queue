@@ -27,7 +27,7 @@ interface QueueInterface extends Countable {
    *
    * @return TaskInterface The task.
    */
-  public function reserve(): TaskInterface;
+  public function reserve(): ?TaskInterface;
   /**
    * Release a reserved job back into the queue.
    *

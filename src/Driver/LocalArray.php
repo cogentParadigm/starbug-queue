@@ -42,7 +42,7 @@ class LocalArray implements QueueInterface {
   /**
    * {@inheritdoc}
    */
-  public function reserve(): TaskInterface {
+  public function reserve(): ?TaskInterface {
     $task = array_shift($this->ready);
     return $this->processing[$task->getId()] = $task;
   }
@@ -77,6 +77,6 @@ class LocalArray implements QueueInterface {
    * {@inheritdoc}
    */
   public function count() {
-    return $this->redis->llen($this->name);
+    return count($this->ready);
   }
 }

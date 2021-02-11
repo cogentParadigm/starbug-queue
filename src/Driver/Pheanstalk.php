@@ -51,7 +51,7 @@ class PheanstalkQueue implements QueueInterface {
   /**
    * {@inheritdoc}
    */
-  public function reserve(): TaskInterface {
+  public function reserve(): ?TaskInterface {
     return $this->jobToTask($this->queue->watch($this->prefix.$this->name)->reserve());
   }
   /**

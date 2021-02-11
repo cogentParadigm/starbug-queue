@@ -17,7 +17,7 @@ interface QueueManagerInterface {
    *
    * @param string $queue The name of the queue.
    */
-  public function processQueue($queue);
+  public function processQueue($queue = "default");
 
   /**
    * Process a specific task.

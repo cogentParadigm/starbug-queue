@@ -22,7 +22,7 @@ class Predis implements QueueInterface {
    * @var Client
    */
   protected $redis;
-  public function __construct($name, ?Client $redis) {
+  public function __construct($name, ?Client $redis = null) {
     $this->name = $name;
     $this->redis = $redis ?? new Client();
   }
@@ -45,11 +45,15 @@ class Predis implements QueueInterface {
   /**
    * {@inheritdoc}
    */
-  public function reserve(): TaskInterface {
-    $id = $this->redis->blmove($this->name, $this->name.":processing", "LEFT", "RIGHT", 0);
-    $data = $this->redis->hgetall($this->name.":item:".$id);
-    $worker = $this->redis->get($this->name.":worker:".$id);
-    return new Task($id, $worker, $this->name, $data);
+  public function reserve(): ?TaskInterface {
+    if ($id = $this->redis->blpop($this->name, 30)) {
+      $id = $id[1];
+      $this->redis->rpush($this->name.":processing", $id);
+      $data = $this->redis->hgetall($this->name.":item:".$id);
+      $worker = $this->redis->get($this->name.":worker:".$id);
+      return new Task($id, $worker, $this->name, $data);
+    }
+    return null;
   }
   /**
    * {@inheritdoc}
@@ -62,8 +66,8 @@ class Predis implements QueueInterface {
    * {@inheritdoc}
    */
   public function remove(TaskInterface $task) {
-    $this->redis->lrem($this->name, $task->getId());
-    $this->redis->lrem($this->name.":processing", $task->getId());
+    $this->redis->lrem($this->name, 1, $task->getId());
+    $this->redis->lrem($this->name.":processing", 1, $task->getId());
     $this->redis->del($this->name.":item:".$task->getId());
     $this->redis->del($this->name.":worker:".$task->getId());
   }
@@ -77,7 +81,7 @@ class Predis implements QueueInterface {
    * {@inheritdoc}
    */
   public function fail(TaskInterface $task) {
-    $this->redis->lrem($this->name.":processing", $task->getId());
+    $this->redis->lrem($this->name.":processing", 1, $task->getId());
     $this->redis->rpush($this->name.":failed", $task->getId());
   }
   /**

@@ -41,9 +41,9 @@ class QueueManager implements QueueManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function processQueue($name) {
+  public function processQueue($name = "default") {
     $queue = $this->getQueue($name);
-    while ($task = $queue->reserve()) {
+    if ($task = $queue->reserve()) {
       $this->processTask($task);
     }
   }
